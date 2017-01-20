@@ -8,7 +8,6 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -84,10 +83,7 @@ public class SideContainer extends Panel implements ActionListener{
 		JTextField start = new JTextField();
 		JTextField end = new JTextField();
 		JTextField steps = new JTextField();
-		JComboBox<Liquid> liquids = new JComboBox<Liquid>((Liquid[]) liquidList.toArray());
 		final JComponent[] inputs = new JComponent[] {
-				new JLabel("Liquid"),
-				liquids,
 		        new JLabel("Start"),
 		        start,
 		        new JLabel("End"),
