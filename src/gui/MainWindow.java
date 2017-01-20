@@ -131,7 +131,7 @@ public class MainWindow extends Frame implements ActionListener{
 		JFreeChart xylineChart = ChartFactory.createXYLineChart(
 	        "" ,
 	        "Radius",
-	        "Heigth",seriescollection,
+	        "Heigth",getDataset(),
 	        PlotOrientation.VERTICAL,
 	        true , true , false);
 		
