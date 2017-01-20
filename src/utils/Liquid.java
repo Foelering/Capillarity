@@ -9,35 +9,37 @@ public class Liquid{
 	
 	private static int numberofseries;
 	
-	private String Name;
-	private double Tension, Density, Cos; //using millimeters, grams, seconds. Cos is the cosine of the contact angle.
+	private String name;
+	private double tension, density, cos; //using millimeters, grams, seconds. Cos is the cosine of the contact angle.
 	private final double g=9806.65; //g in mm/s^2
 	
-	public Liquid(String Name, double Tension, double Density, double Angle){
-		this.Name = Name;
-		this.Tension = Tension;
-		this.Density = Density;
-		this.Cos = Math.cos(Math.toRadians(Angle));
+	public Liquid(String newName, double newTension, double newDensity, double newAngle){
+		this.name = newName;
+		this.tension = newTension;
+		this.density = newDensity;
+		this.cos = Math.cos(Math.toRadians(newAngle));
 	}
 	
 	public String getName(){
-		return Name;
+		return name;
 	}
 	
 	private double heigth(double r){
-		return 2*Tension*Cos/(r*Density*g);
+		return 2*tension*cos/(r*density*g);
 	}
 	
 	public XYSeries generateSeries(double start, double end, int steps){
 		double step = (end-start)/steps;
 		numberofseries++;
-		String a = this.Name + "_" + numberofseries;
-		
-		
+		String a = this.name + "_" + numberofseries;
+				
 		XYSeries series = new XYSeries(a);
-		for (int i=0;i<steps;i++){
+		
+		series.add(start,heigth(start));
+		for (int i=1;i<=steps;i++){
 			series.add(start + i*step, heigth(start + i*step));
 		}
+		series.add(end,heigth(end));
 		
 		return series;
 	}
