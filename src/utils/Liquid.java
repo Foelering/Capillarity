@@ -7,6 +7,8 @@ import org.jfree.data.xy.XYSeries;
 
 public class Liquid{
 	
+	private static int numberofseries;
+	
 	private String Name;
 	private double Tension, Density, Cos; //using millimeters, grams, seconds. Cos is the cosine of the contact angle.
 	private final double g=9806.65; //g in mm/s^2
@@ -28,7 +30,8 @@ public class Liquid{
 	
 	public XYSeries generateSeries(double start, double end, int steps){
 		double step = (end-start)/steps;
-		String a = this.Name + start + "-" + end + ";" + steps;
+		numberofseries++;
+		String a = this.Name + "_" + numberofseries;
 		
 		
 		XYSeries series = new XYSeries(a);
