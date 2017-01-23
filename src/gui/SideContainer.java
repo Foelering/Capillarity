@@ -6,8 +6,10 @@ import java.awt.Panel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-
+import javax.swing.JCheckBox;
+import javax.swing.JComboBox;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -24,9 +26,19 @@ public class SideContainer extends Panel implements ActionListener{
 	private List<Liquid> liquidList = new ArrayList<Liquid>(); //editable list of liquids available, gets it from conf file
 	private XYSeriesCollection seriesCollection = new XYSeriesCollection(); //collection which will be shown on the graph
 	private Button buttonAdder = new Button("+");
+	private Button liquidAdder = new Button("New Liquid...");
 	
 	public XYSeriesCollection getDataset(){
 		return seriesCollection;
+	}
+	
+	public Button getLiquidAdder(){
+		return liquidAdder;
+	}
+	
+	private void remove(LiquidButton button){
+		button.close();
+		remove((Button) button);
 	}
 	
 	private class LiquidButton extends Button{
@@ -40,10 +52,9 @@ public class SideContainer extends Panel implements ActionListener{
 	
 		private XYSeries LiquidSeries;
 		private Liquid liquid;
-		private double start, end;
-		private int steps;
+		private double start=0, end=0;
+		private int steps=0;
 		
-		@SuppressWarnings("unused")
 		public Liquid getLiquid(){
 			return liquid;
 		}
@@ -60,82 +71,102 @@ public class SideContainer extends Panel implements ActionListener{
 			return steps;
 		}
 		
-		public void close(){
-			seriesCollection.removeSeries(LiquidSeries);
-		}
-		
-		LiquidButton(Liquid liquid, double start, double end, int steps){
-			
-			super(liquid.getName() + ", " + start + "-"+ end );
+		public void changeTo(Liquid liquid, double start, double end, int steps){
 			this.liquid=liquid;
 			this.start=start;
 			this.end=end;
-			this.steps=steps;	
+			this.steps=steps;
+			this.setLabel(liquid.getName() + "\n, " + start + "-"+ end );
 			LiquidSeries = liquid.generateSeries(start, end, steps);
 			setPreferredSize(new java.awt.Dimension(80, 20));
 			seriesCollection.addSeries(LiquidSeries);
+		}
+		
+		public void close(){
+			seriesCollection.removeSeries(this.LiquidSeries);
+		}		
+
+		public LiquidButton() {
+			super();
 		}
 		
 		
 	}
 	
 	private void createButton(){
-		JTextField start = new JTextField();
-		JTextField end = new JTextField();
-		JTextField steps = new JTextField();
+		createButton(new LiquidButton());
+	}
+	
+	private void createButton(LiquidButton button){
+		
+		List<String> strings = new ArrayList<String>();
+		Iterator<Liquid> i = liquidList.iterator();
+		while(i.hasNext()){
+			strings.add(i.next().getName());
+		}
+		String[] namelist = strings.toArray(new String[strings.size()]);
+		
+		JComboBox<String> liquidChooser = new JComboBox<String>(namelist);
+		JTextField start = new JTextField(Double.toString(button.getStart()));
+		JTextField end = new JTextField(Double.toString(button.getEnd()));
+		JTextField steps = new JTextField(Integer.toString(button.getSteps()));
+        JCheckBox deletePrompt = new JCheckBox("Delete the series?");
 		final JComponent[] inputs = new JComponent[] {
+				new JLabel("Liquid"),
+				liquidChooser,
 		        new JLabel("Start"),
 		        start,
 		        new JLabel("End"),
 		        end,
 		        new JLabel("Steps"),
-		        steps
+		        steps,
+		        deletePrompt
 		};
-		int result = JOptionPane.showConfirmDialog(null, inputs, "My custom dialog", JOptionPane.PLAIN_MESSAGE);
+		int result = JOptionPane.showConfirmDialog(null, inputs, "My custom dialog", JOptionPane.OK_CANCEL_OPTION);
 		if (result == JOptionPane.OK_OPTION) {
 		    System.out.println("You entered " +
+		    		liquidChooser.getSelectedItem() + ", " +
 		            start.getText() + ", " +
 		            end.getText() + ", " +
 		            steps.getText());
+		    if (deletePrompt.isSelected()){
+		    	button.close();
+		    	remove(button);
+		    } else {
+		    	button.changeTo(liquidList.get(liquidChooser.getSelectedIndex()),Double.parseDouble(start.getText()),Double.parseDouble(end.getText()),Integer.parseInt(steps.getText()));
+			    button.addActionListener(this);
+			    add(button);
+		    }
 		    
-		    LiquidButton b = new LiquidButton(liquidList.get(0),Double.parseDouble(start.getText()),Double.parseDouble(end.getText()),Integer.parseInt(steps.getText()));
-		    b.addActionListener(this);
-		    add(b);
-		    
-		} else {
+		} else if (result ==JOptionPane.CANCEL_OPTION) {
 		    System.out.println("User canceled / closed the dialog, result = " + result);
+		} else {
+			
+		}
+	}
+
+	private void addLiquid(){
+		
+		JTextField name = new JTextField();
+		JTextField tension = new JTextField();
+		JTextField density = new JTextField();
+		JTextField angle = new JTextField();
+		final JComponent[] inputs = new JComponent[] {
+				new JLabel("Liquid Name"),
+				name,
+		        new JLabel("Surface Tension"),
+		        tension,
+		        new JLabel("Density"),
+		        density,
+		        new JLabel("Angle"),
+		        angle
+		};
+		int result = JOptionPane.showConfirmDialog(null, inputs, "Create New Liquid", JOptionPane.OK_CANCEL_OPTION);
+		if (result == JOptionPane.OK_OPTION) {
+			liquidList.add(new Liquid(name.getText(),Double.parseDouble(tension.getText()), Double.parseDouble(density.getText()), Double.parseDouble(angle.getText())));
 		}
 	}
 	
-	private void createButton(double oldstart, double oldend, int oldsteps){
-		JTextField start = new JTextField(Double.toString(oldstart));
-		JTextField end = new JTextField(Double.toString(oldend));
-		JTextField steps = new JTextField(Integer.toString(oldsteps));
-		final JComponent[] inputs = new JComponent[] {
-		        new JLabel("Start"),
-		        start,
-		        new JLabel("End"),
-		        end,
-		        new JLabel("Steps"),
-		        steps
-		};
-		int result = JOptionPane.showConfirmDialog(null, inputs, "My custom dialog", JOptionPane.PLAIN_MESSAGE);
-		if (result == JOptionPane.OK_OPTION) {
-		    System.out.println("You entered " +
-		            start.getText() + ", " +
-		            end.getText() + ", " +
-		            steps.getText());
-		    
-		    LiquidButton b = new LiquidButton(liquidList.get(0),Double.parseDouble(start.getText()),Double.parseDouble(end.getText()),Integer.parseInt(steps.getText()));
-		    b.addActionListener(this);
-		    add(b);
-		    
-		} else {
-		    System.out.println("User canceled / closed the dialog, result = " + result);
-
-		}
-	}
-
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		
@@ -144,13 +175,12 @@ public class SideContainer extends Panel implements ActionListener{
 		if(e.getSource() == buttonAdder){
 			createButton();
 			
+		}else if(e.getSource() == liquidAdder){
+			
+			addLiquid();
+			
 		} else if (e.getSource() instanceof LiquidButton){
-			((LiquidButton) e.getSource()).close();
-			double S = ((LiquidButton) e.getSource()).getStart();
-			double E = ((LiquidButton) e.getSource()).getEnd();
-			int N = ((LiquidButton) e.getSource()).getSteps();
-			remove((LiquidButton) e.getSource());
-			createButton(S,E,N);
+			createButton((LiquidButton) e.getSource());
 		}
 
 		revalidate();
@@ -167,6 +197,7 @@ public class SideContainer extends Panel implements ActionListener{
 		setPreferredSize(new java.awt.Dimension(100, 300));
 		add(buttonAdder);
 		buttonAdder.addActionListener(this);
+		liquidAdder.addActionListener(this);
 	}
 
 }

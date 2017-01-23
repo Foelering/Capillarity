@@ -24,7 +24,7 @@ public class MainWindow extends Frame{
 		setTitle("Grafici!");
 		setLayout(new BorderLayout());
 		add(sidePane, BorderLayout.WEST);
-		
+		add(sidePane.getLiquidAdder(), BorderLayout.NORTH);
 		setSize(500, 300);
 		
 		JFreeChart xylineChart = ChartFactory.createXYLineChart(
