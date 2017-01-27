@@ -8,6 +8,8 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JComponent;
@@ -50,7 +52,7 @@ public class SideContainer extends Panel implements ActionListener{
 		
 
 	
-		private XYSeries LiquidSeries;
+		private XYSeries liquidSeries;
 		private Liquid liquid;
 		private double start=0, end=0;
 		private int steps=0;
@@ -72,18 +74,21 @@ public class SideContainer extends Panel implements ActionListener{
 		}
 		
 		public void changeTo(Liquid liquid, double start, double end, int steps){
+			if(liquidSeries!=null){
+				seriesCollection.removeSeries(liquidSeries);
+			}
 			this.liquid=liquid;
 			this.start=start;
 			this.end=end;
 			this.steps=steps;
 			this.setLabel(liquid.getName() + "\n, " + start + "-"+ end );
-			LiquidSeries = liquid.generateSeries(start, end, steps);
+			liquidSeries = liquid.generateSeries(start, end, steps);
 			setPreferredSize(new java.awt.Dimension(80, 20));
-			seriesCollection.addSeries(LiquidSeries);
+			seriesCollection.addSeries(liquidSeries);
 		}
 		
 		public void close(){
-			seriesCollection.removeSeries(this.LiquidSeries);
+			seriesCollection.removeSeries(this.liquidSeries);
 		}		
 
 		public LiquidButton() {
@@ -104,9 +109,16 @@ public class SideContainer extends Panel implements ActionListener{
 		while(i.hasNext()){
 			strings.add(i.next().getName());
 		}
-		String[] namelist = strings.toArray(new String[strings.size()]);
+		DefaultComboBoxModel<String> namelist = new DefaultComboBoxModel<String>(strings.toArray(new String[strings.size()]));
+		
+		if(button.getLiquid()==null){
+			namelist.setSelectedItem(strings.get(0));
+		}else{
+			namelist.setSelectedItem(strings.get(liquidList.indexOf(button.getLiquid())));
+		}
 		
 		JComboBox<String> liquidChooser = new JComboBox<String>(namelist);
+		
 		JTextField start = new JTextField(Double.toString(button.getStart()));
 		JTextField end = new JTextField(Double.toString(button.getEnd()));
 		JTextField steps = new JTextField(Integer.toString(button.getSteps()));
@@ -122,7 +134,7 @@ public class SideContainer extends Panel implements ActionListener{
 		        steps,
 		        deletePrompt
 		};
-		int result = JOptionPane.showConfirmDialog(null, inputs, "My custom dialog", JOptionPane.OK_CANCEL_OPTION);
+		int result = JOptionPane.showConfirmDialog(null, inputs, "Button options", JOptionPane.OK_CANCEL_OPTION);
 		if (result == JOptionPane.OK_OPTION) {
 		    System.out.println("You entered " +
 		    		liquidChooser.getSelectedItem() + ", " +
@@ -169,8 +181,6 @@ public class SideContainer extends Panel implements ActionListener{
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
-		
-		System.out.println(e.getSource().getClass().getSimpleName());
 		
 		if(e.getSource() == buttonAdder){
 			createButton();

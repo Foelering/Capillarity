@@ -9,7 +9,7 @@ public class Liquid{
 	
 	private static int numberofseries;
 	
-	private String name;
+	private String name=null;
 	private double tension, density, cos; //using millimeters, grams, seconds. Cos is the cosine of the contact angle.
 	private final double g=9806.65; //g in mm/s^2
 	
