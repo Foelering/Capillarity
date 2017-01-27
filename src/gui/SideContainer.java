@@ -126,9 +126,9 @@ public class SideContainer extends Panel implements ActionListener{
 		final JComponent[] inputs = new JComponent[] {
 				new JLabel("Liquid"),
 				liquidChooser,
-		        new JLabel("Start"),
+		        new JLabel("Start radius (cm)"),
 		        start,
-		        new JLabel("End"),
+		        new JLabel("End radius (cm)"),
 		        end,
 		        new JLabel("Steps"),
 		        steps,
@@ -166,11 +166,11 @@ public class SideContainer extends Panel implements ActionListener{
 		final JComponent[] inputs = new JComponent[] {
 				new JLabel("Liquid Name"),
 				name,
-		        new JLabel("Surface Tension"),
+		        new JLabel("Surface Tension (dyn/cm)"),
 		        tension,
-		        new JLabel("Density"),
+		        new JLabel("Density (g)"),
 		        density,
-		        new JLabel("Angle"),
+		        new JLabel("Angle (°)"),
 		        angle
 		};
 		int result = JOptionPane.showConfirmDialog(null, inputs, "Create New Liquid", JOptionPane.OK_CANCEL_OPTION);
