@@ -3,7 +3,13 @@ package utils;
 import java.lang.Math;
 import org.jfree.data.xy.XYSeries;
 
-//A class to register the information needed to calculate the information needed for Jurin's law.
+
+/**
+ *A class to register the information needed to calculate the information
+ * needed for Jurin's law, and generate series when needed.
+ *
+ */
+
 
 public class Liquid{
 	
@@ -13,11 +19,12 @@ public class Liquid{
 	private double tension, density, cos; //using CGS system. Cos is the cosine of the contact angle.
 	private final double g=9806.65; //g in mm/s^2
 	
-	public Liquid(String newName, double newTension, double newDensity, double newAngle){
-		this.name = newName;
-		this.tension = newTension;
-		this.density = newDensity;
-		this.cos = Math.cos(Math.toRadians(newAngle));
+	//creates a new liquid, these fields cannot be changed afterwards in any way.
+	public Liquid(String name, double tension, double density, double angle){
+		this.name = name;
+		this.tension = tension;
+		this.density = density;
+		this.cos = Math.cos(Math.toRadians(angle));
 	}
 	
 	public String getName(){
@@ -28,6 +35,7 @@ public class Liquid{
 		return 2*tension*cos/(r*density*g);
 	}
 	
+	//only real public interface, generates a series spanning from start to end with some steps in the middle
 	public XYSeries generateSeries(double start, double end, int steps){
 		double step = (end-start)/steps;
 		numberofseries++;

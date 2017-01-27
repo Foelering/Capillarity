@@ -22,10 +22,16 @@ import org.jfree.data.xy.XYSeriesCollection;
 
 import utils.Liquid;
 
+/**
+ * A side panel which contains the "+" button, contains the buttons connected to the various
+ * series, creates dialogs. Also has the seriesCollection in it.
+ * 
+ */
+
 public class SideContainer extends Panel implements ActionListener{
 	
 	private static final long serialVersionUID = -4807314086451566347L;
-	private List<Liquid> liquidList = new ArrayList<Liquid>(); //editable list of liquids available, gets it from conf file
+	private List<Liquid> liquidList = new ArrayList<Liquid>(); //editable list of liquids available
 	private XYSeriesCollection seriesCollection = new XYSeriesCollection(); //collection which will be shown on the graph
 	private Button buttonAdder = new Button("+");
 	private Button liquidAdder = new Button("New Liquid...");
@@ -73,7 +79,7 @@ public class SideContainer extends Panel implements ActionListener{
 			return steps;
 		}
 		
-		public void changeTo(Liquid liquid, double start, double end, int steps){
+		public void changeTo(Liquid liquid, double start, double end, int steps){//Changes the characteristics of the button, and regenerates the series.
 			if(liquidSeries!=null){
 				seriesCollection.removeSeries(liquidSeries);
 			}
@@ -87,23 +93,24 @@ public class SideContainer extends Panel implements ActionListener{
 			seriesCollection.addSeries(liquidSeries);
 		}
 		
-		public void close(){
+		public void close(){//to be called everytime a button is destroyed, as to clean up the series.
 			seriesCollection.removeSeries(this.liquidSeries);
 		}		
 
-		public LiquidButton() {
+		public LiquidButton() {//no substantial changes in the constructor
 			super();
 		}
 		
 		
 	}
 	
-	private void createButton(){
-		createButton(new LiquidButton());
+	private void createButton(){//Creates a new button and invokes changeButton to it as to define the series
+		changeButton(new LiquidButton());
 	}
 	
-	private void createButton(LiquidButton button){
+	private void changeButton(LiquidButton button){//opens a dialog and changes the button accordingly to input
 		
+		//generates a string DefaultComboBox to use in JComboBox, found no straightforward way
 		List<String> strings = new ArrayList<String>();
 		Iterator<Liquid> i = liquidList.iterator();
 		while(i.hasNext()){
@@ -117,12 +124,13 @@ public class SideContainer extends Panel implements ActionListener{
 			namelist.setSelectedItem(strings.get(liquidList.indexOf(button.getLiquid())));
 		}
 		
+		//Generates the fields of the dialog
 		JComboBox<String> liquidChooser = new JComboBox<String>(namelist);
-		
 		JTextField start = new JTextField(Double.toString(button.getStart()));
 		JTextField end = new JTextField(Double.toString(button.getEnd()));
 		JTextField steps = new JTextField(Integer.toString(button.getSteps()));
         JCheckBox deletePrompt = new JCheckBox("Delete the series?");
+        
 		final JComponent[] inputs = new JComponent[] {
 				new JLabel("Liquid"),
 				liquidChooser,
@@ -134,6 +142,8 @@ public class SideContainer extends Panel implements ActionListener{
 		        steps,
 		        deletePrompt
 		};
+		
+		//Creates the dialog and processes the input
 		int result = JOptionPane.showConfirmDialog(null, inputs, "Button options", JOptionPane.OK_CANCEL_OPTION);
 		if (result == JOptionPane.OK_OPTION) {
 		    System.out.println("You entered " +
@@ -157,7 +167,7 @@ public class SideContainer extends Panel implements ActionListener{
 		}
 	}
 
-	private void addLiquid(){
+	private void addLiquid(){//opens a dialog and generates a liquid object accordingly, then adds it to the liquidList
 		
 		JTextField name = new JTextField();
 		JTextField tension = new JTextField();
@@ -180,7 +190,7 @@ public class SideContainer extends Panel implements ActionListener{
 	}
 	
 	@Override
-	public void actionPerformed(ActionEvent e) {
+	public void actionPerformed(ActionEvent e) {//Performs actions when a button is pressed.
 		
 		if(e.getSource() == buttonAdder){
 			createButton();
@@ -190,7 +200,7 @@ public class SideContainer extends Panel implements ActionListener{
 			addLiquid();
 			
 		} else if (e.getSource() instanceof LiquidButton){
-			createButton((LiquidButton) e.getSource());
+			changeButton((LiquidButton) e.getSource());
 		}
 
 		revalidate();
@@ -198,6 +208,7 @@ public class SideContainer extends Panel implements ActionListener{
 	
 	SideContainer(){
 		
+		//adding new "default" liquids to the list.
 		liquidList.add(new Liquid("Acqua", 7.26, 1, 30));
 		liquidList.add(new Liquid("Alcool", 2.2, 0.789, 0));
 		liquidList.add(new Liquid("Ioduro di Metilene", 5.08, 3.3, 0));
